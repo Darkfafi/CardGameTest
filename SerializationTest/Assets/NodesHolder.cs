@@ -10,6 +10,7 @@ public class NodesHolder : MonoBehaviour
 	
     protected void Awake()
     {
+        return;
         for(int i = 0; i < 100; i++)
         {
             SuperNode1 sn1 = new SuperNode1();
@@ -30,31 +31,16 @@ public class NodesHolder : MonoBehaviour
 
     public void Save()
     {
+        string path = "Assets/nodesList";
         XmlObjectReferences references = new XmlObjectReferences();
-        XmlDocument doc = new XmlDocument();
-        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-        XmlElement root = doc.DocumentElement;
-        doc.InsertBefore(dec, root);
-
-        StreamWriter writer = new StreamWriter("Assets/nodesList.xml");
-
-        nodesList.SaveNodes(doc, references);
-
-        references.Saving_EndReferenceCounter();
-
-        doc.Save(writer.BaseStream);
-        writer.Close();
+        references.Saving_SaveContainer(nodesList, path);
     }
 
     public void Load()
     {
+        string path = "Assets/nodesList";
         XmlObjectReferences references = new XmlObjectReferences();
-        StreamReader reader = new StreamReader("Assets/nodesList.xml");
-        XmlDocument doc = new XmlDocument();
-        doc.Load(reader.BaseStream);
-        nodesList.LoadNodes(doc, references);
-        references.Loading_EndReferenceCounter();
-        reader.Close();
+        references.Loading_LoadContainer(nodesList, path);
     }
 
     public void Action()

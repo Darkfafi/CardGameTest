@@ -18,34 +18,22 @@ public abstract class Node<T> : Node where T : NodeData
 
 public class NodeData { }
 
-public abstract class Node : Saveable
+public abstract class Node : ISaveable
 {
     public string NodeQuote;
-    public string TypeString
+
+    public void Save(XmlDocument doc, XmlObjectReferences references, XmlElement saveableElement)
     {
-        get
-        {
-            return GetType().FullName;
-        }
+        XmlElement quoteElement = doc.CreateElement("NodeQuote");
+        quoteElement.AppendChild(doc.CreateTextNode(NodeQuote));
+        saveableElement.AppendChild(quoteElement);
+        SuperSave(saveableElement, doc, references);
     }
 
-    public XmlElement Save(XmlDocument doc, XmlObjectReferences references)
+    public void Load(XmlElement savedData, XmlObjectReferences references)
     {
-        XmlElement node = doc.CreateElement("Node");
-
-        XmlElement quoteElement = doc.CreateElement("NodeQuote");
-
-        XmlText quoteText = doc.CreateTextNode(NodeQuote);
-
-        quoteElement.AppendChild(quoteText);
-        node.AppendChild(quoteElement);
-        node.SetAttribute("NodeType", TypeString);
-        node.SetAttribute("SerializedReference", references.Saving_UseRefCounter(this).ToString());
-
-        SuperSave(node, doc, references);
-
-        return node;
-
+        NodeQuote = savedData.GetElementsByTagName("NodeQuote").Item(0).InnerText;
+        SuperLoad(savedData, references);
     }
 
     public virtual void Activate()
@@ -55,19 +43,4 @@ public abstract class Node : Saveable
 
     protected abstract void SuperSave(XmlElement nodeElement, XmlDocument doc, XmlObjectReferences references);
     protected abstract void SuperLoad(XmlElement saveData, XmlObjectReferences references);
-
-    public void Load(XmlElement saveData, XmlObjectReferences references)
-    {
-        NodeQuote = saveData.GetElementsByTagName("NodeQuote").Item(0).InnerText;
-        uint counterId = uint.Parse(saveData.GetAttribute("SerializedReference"));
-        references.Loading_SetRefCounterFor(this, counterId);
-        SuperLoad(saveData, references);
-    }
-}
-
-public interface Saveable
-{
-    string TypeString { get; }
-    XmlElement Save(XmlDocument doc, XmlObjectReferences references);
-    void Load(XmlElement saveData, XmlObjectReferences references);
 }

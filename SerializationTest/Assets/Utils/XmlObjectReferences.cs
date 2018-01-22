@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
+using System.IO;
+using System;
 
 public class XmlObjectReferences
 {
@@ -8,7 +11,7 @@ public class XmlObjectReferences
     private Dictionary<object, uint> referenceWithoutCounterUseReservations = new Dictionary<object, uint>();
 
     private Dictionary<uint, object> setterCounterMap = new Dictionary<uint, object>();
-    private Dictionary<uint, System.Action<uint, object>> waitingForSetterCounter = new Dictionary<uint, System.Action<uint, object>>();
+    private Dictionary<uint, Action<uint, object>> waitingForSetterCounter = new Dictionary<uint, Action<uint, object>>();
 
     private uint refCounter = 1;
 
@@ -29,7 +32,7 @@ public class XmlObjectReferences
     /// </summary>
     /// <param name="counterId"></param>
     /// <param name="objectCreatedCallback"></param>
-    public void Loading_GetReferenceFrom(uint counterId, System.Action<uint, object> objectCreatedCallback)
+    public void Loading_GetReferenceFrom(uint counterId, Action<uint, object> objectCreatedCallback)
     {
         if (counterId == 0) { return; }
         if(!waitingForSetterCounter.ContainsKey(counterId))
@@ -92,6 +95,12 @@ public class XmlObjectReferences
         }
     }
 
+    public bool Saving_HasRefCounterFor(object objectToRef)
+    {
+        if (objectToRef == null) { return false; }
+        return instanceToRefCounterMap.ContainsKey(objectToRef);
+    }
+
     /// <summary>
     /// Creates a Reference id for the given instance
     /// </summary>
@@ -128,4 +137,95 @@ public class XmlObjectReferences
         instanceToRefCounterMap.Clear();
         referenceWithoutCounterUseReservations.Clear();
     }
+}
+
+public static class XmlObjectReferencesExtensions
+{
+    public const string SAVEABLE_TAG = "Saveable";
+    public const string REFERENCE_ID_TAG = "ReferenceId";
+    public const string OBJECT_TYPE_TAG = "ObjectType";
+
+    /// <summary>
+    /// Saves the returned content of the container to the given path as Xml file & Ends the Saver
+    /// </summary>
+    /// <param name="references"></param>
+    /// <param name="container"></param>
+    /// <param name="path">Folders & FileName without extension</param>
+    public static void Saving_SaveContainer(this XmlObjectReferences references, ISaveContainer container, string path)
+    {
+        XmlDocument doc = new XmlDocument();
+        XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+        XmlElement root = doc.DocumentElement;
+        doc.InsertBefore(dec, root);
+
+        StreamWriter writer = new StreamWriter(path + ".xml");
+
+        ISaveable[] saveables = container.SaveablesToSave();
+
+        XmlElement containerElement = doc.CreateElement(container.GetType().Name);
+
+        for (int i = 0; i < saveables.Length; i++)
+        {
+            XmlElement saveableElement = doc.CreateElement(SAVEABLE_TAG);
+            saveableElement.SetAttribute(REFERENCE_ID_TAG, references.Saving_UseRefCounter(saveables[i]).ToString());
+            saveableElement.SetAttribute(OBJECT_TYPE_TAG, saveables[i].GetType().FullName.ToString());
+            saveables[i].Save(doc, references, saveableElement);
+            containerElement.AppendChild(saveableElement);
+        }
+
+        references.Saving_EndReferenceCounter();
+        doc.AppendChild(containerElement);
+        doc.Save(writer.BaseStream);
+        writer.Close();
+    }
+
+    /// <summary>
+    /// Loads all the ISaveables from the given path xml file and loads it into the container
+    /// NOTE: Only works if the xml file was saved with the 'Saving_SaveContainer' method!
+    /// </summary>
+    /// <param name="references"></param>
+    /// <param name="containerToLoadInto"></param>
+    /// <param name="path">Folders & FileName without extension</param>
+    public static void Loading_LoadContainer(this XmlObjectReferences references, ISaveContainer containerToLoadInto, string path)
+    {
+        XmlDocument doc = new XmlDocument();
+        StreamReader reader = new StreamReader(path + ".xml");
+        doc.Load(reader.BaseStream);
+
+        XmlNodeList list = doc.GetElementsByTagName(SAVEABLE_TAG);
+        object[] loadedSaveables = new object[list.Count];
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            ISaveable saveable = (ISaveable)Activator.CreateInstance(Type.GetType(list.Item(i).Attributes.GetNamedItem(OBJECT_TYPE_TAG).Value));
+            loadedSaveables[i] = saveable;
+            XmlElement saveableXml = GetElement(list.Item(i).OuterXml);
+            saveable.Load(saveableXml, references);
+            references.Loading_SetRefCounterFor(saveable, uint.Parse(saveableXml.GetAttribute( REFERENCE_ID_TAG )));
+        }
+
+        reader.Close();
+
+        containerToLoadInto.SaveablesToLoad(loadedSaveables);
+        references.Loading_EndReferenceCounter();
+    }
+
+    public static XmlElement GetElement(string xml)
+    {
+        XmlDocument doc = new XmlDocument();
+        doc.LoadXml(xml);
+        return doc.DocumentElement;
+    }
+}
+
+public interface ISaveContainer
+{
+    void SaveablesToLoad(object[] saveables);
+    ISaveable[] SaveablesToSave();
+}
+
+public interface ISaveable
+{
+    void Save(XmlDocument doc, XmlObjectReferences references, XmlElement saveableElement);
+    void Load(XmlElement savedData, XmlObjectReferences references);
 }

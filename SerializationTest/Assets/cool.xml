@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MasterObject ReferenceId="1" ReferenceType="MasterObject">
+  <List IsReference="True">2</List>
+  <List ReferenceId="2" ReferenceType="System.Collections.Generic.List`1[[SubObject, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]" />
+</MasterObject>
