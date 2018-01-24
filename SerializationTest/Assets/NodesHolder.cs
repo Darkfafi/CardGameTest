@@ -23,7 +23,7 @@ public class NodesHolder : MonoBehaviour
 
         for (int i = 0; i < 100; i++)
         {
-            SuperNode2 sn2 = new SuperNode2();
+            SuperNode2<SuperNode1> sn2 = new SuperNode2<SuperNode1>();
             sn2.NodeData.Node1Data = nodesList.Nodes[Random.Range(0, 100)];
             nodesList.Nodes.Add(sn2);
         }

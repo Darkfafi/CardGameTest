@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
-public class SuperNode2 : Node<SuperNode2Data>
+public class SuperNode2<T> : Node<SuperNode2Data>
 {
     public SuperNode2() : base(new SuperNode2Data())
     {
@@ -24,7 +24,6 @@ public class SuperNode2 : Node<SuperNode2Data>
 
     protected override void SuperSave(XmlElement nodeElement, XmlDocument doc, XmlObjectReferences references)
     {
-        uint refId = references.Saving_GetRefCounterFor(NodeData.Node1Data);
         XmlElement data = doc.CreateElement("Data");
         XmlElement superNodeRef = doc.CreateElement("NodeRef");
         data.AppendChild(superNodeRef);
