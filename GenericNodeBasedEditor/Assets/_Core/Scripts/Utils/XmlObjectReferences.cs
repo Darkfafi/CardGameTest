@@ -141,7 +141,6 @@ public class XmlObjectReferences
 
 public static class XmlObjectReferencesExtensions
 {
-    public const string ROOT_TAG = "GNE_SaveFile";
     public const string SAVEABLE_TAG = "Saveable";
 
     public const string REFERENCE_ID_ATTR = "ReferenceId";
@@ -154,7 +153,7 @@ public static class XmlObjectReferencesExtensions
     /// <param name="references"></param>
     /// <param name="container"></param>
     /// <param name="path">Folders & FileName</param>
-    public static void Saving_SaveContainer(this XmlObjectReferences references, ISaveContainer container, string path)
+    public static void Saving_SaveContainer(this XmlObjectReferences references, ISaveContainer container, string path, string rootTag)
     {
         XmlDocument doc = new XmlDocument();
         XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
@@ -165,7 +164,7 @@ public static class XmlObjectReferencesExtensions
 
         ISaveable[] saveables = container.SaveablesToSave();
 
-        XmlElement containerElement = doc.CreateElement( ROOT_TAG );
+        XmlElement containerElement = doc.CreateElement(rootTag);
         containerElement.SetAttribute( CONTAINER_TYPE_ATTR , container.GetType().FullName);
 
         for (int i = 0; i < saveables.Length; i++)
@@ -196,7 +195,21 @@ public static class XmlObjectReferencesExtensions
         XmlDocument doc = new XmlDocument();
         StreamReader reader = new StreamReader(path);
         doc.Load(reader.BaseStream);
-
+        Loading_LoadContainerWithXml(references, containerToLoadInto, doc.DocumentElement.OuterXml);
+        reader.Close();
+    }
+    
+    /// <summary>
+     /// Loads all the ISaveables from the given path xml file and loads it into the container
+     /// NOTE: Only works if the xml file was saved with the 'Saving_SaveContainer' method!
+     /// </summary>
+     /// <param name="references"></param>
+     /// <param name="containerToLoadInto"></param>
+     /// <param name="path">Folders & FileName</param>
+    public static void Loading_LoadContainerWithXml(this XmlObjectReferences references, ISaveContainer containerToLoadInto, string xmlData)
+    {
+        XmlDocument doc = new XmlDocument();
+        doc.LoadXml(xmlData);
         XmlNodeList list = doc.GetElementsByTagName(SAVEABLE_TAG);
         object[] loadedSaveables = new object[list.Count];
         List<ISaveable> saveablesCreated = new List<ISaveable>();
@@ -219,22 +232,18 @@ public static class XmlObjectReferencesExtensions
             saveablesCreated.Add(saveable);
             XmlElement saveableXml = GetElement(list.Item(i).OuterXml);
             saveable.Load(saveableXml, references);
-            references.Loading_SetRefCounterFor(saveable, uint.Parse(saveableXml.GetAttribute( REFERENCE_ID_ATTR )));
+            references.Loading_SetRefCounterFor(saveable, uint.Parse(saveableXml.GetAttribute(REFERENCE_ID_ATTR)));
         }
-
-        reader.Close();
 
         containerToLoadInto.SaveablesToLoad(loadedSaveables);
         references.Loading_EndReferenceCounter();
 
-        for(int i = 0; i < saveablesCreated.Count; i++)
+        for (int i = 0; i < saveablesCreated.Count; i++)
         {
             saveablesCreated[i].AllDataLoaded();
         }
 
         saveablesCreated.Clear();
-
-        //Debug.Log("Data Loaded from " + path);
     }
 
     // Extra Helpers

@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16bfc31700276ad479f5cc130089eb40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gneFile: {fileID: 0}
+  gneFile: {fileID: 4900000, guid: 7358aeb0a27e30b4b89bcd221764c3f6, type: 3}
 --- !u!81 &2016159199
 AudioListener:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ using System.Linq;
 using System.IO;
 using System.Xml;
 
-public class BaseGenericNodeEditor : EditorWindow, IOriginScene
+public class GenericNodeEditor : EditorWindow, IOriginScene
 {
     public const string EDITOR_EXTENSION = ".xml";
 
@@ -18,19 +18,23 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         }
     }
 
-    
-    [MenuItem("Assets/Create Generic Node Editor File")]
-    public static void CreateWindow()
+    public static void OpenWindow(string activeObjectName, Type runnableType)
     {
-        string path = AssetDatabase.GenerateUniqueAssetPath(Selection.activeObject.name + "/newNodeFile" + EDITOR_EXTENSION);
+        Type inputType = null;
+
+        if(runnableType.IsDefined(typeof(NodeInputDataAttribute), false))
+        {
+            inputType = ((NodeInputDataAttribute)runnableType.GetCustomAttributes(typeof(NodeInputDataAttribute), false)[0]).InputDataType;
+        }
+
+        string path = AssetDatabase.GenerateUniqueAssetPath(activeObjectName + "/newNodeFile" + EDITOR_EXTENSION);
         AssetDatabase.CreateAsset(new TextAsset(), path);
-        CreateWindow(path).Save();
+        CreateWindow(path, inputType, true).Save();
     }
 
     [UnityEditor.Callbacks.OnOpenAsset(1)]
     public static bool OnOpenAsset(int instanceID, int line)
     {
-        Debug.Log(Selection.activeObject.GetType());
         TextAsset ta = Selection.activeObject as TextAsset;
         
         if (ta != null)
@@ -40,9 +44,10 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
             {
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(ta.text);
-                if (doc.GetElementsByTagName(XmlObjectReferencesExtensions.ROOT_TAG).Count > 0)
+                Type t = TypeSaveable.GetTypeFromString(doc.DocumentElement.GetSingleDataFrom("TypeName"));
+                if (GenericNodesSaveData.IsValidFile(ta))
                 {
-                    CreateWindow(path).Load();
+                    CreateWindow(path, t, false).Load();
                     return true;
                 }
             }
@@ -51,15 +56,32 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         return false;
     }
 
-    private static BaseGenericNodeEditor CreateWindow(string path)
+    private static GenericNodeEditor CreateWindow(string path, Type inputType, bool isNewFile)
     {
-        BaseGenericNodeEditor bgne = GetWindow<BaseGenericNodeEditor>("Generic Node Editor DEBUG WINDOW", true);
+        GenericNodeEditor bgne = GetWindow<GenericNodeEditor>("Generic Node Editor", true);
         bgne.filePath = path;
+        bgne.inputType = inputType;
+
+        if(bgne.inputType == null)
+        {
+            bgne.inputType = typeof(ConnectionModel);
+        }
+
         bgne.ShowPopup();
+        if (isNewFile)
+            bgne.FileCreatedCall();
+
         return bgne;
     }
 
+    private void FileCreatedCall()
+    {
+        Type inputModelType = typeof(InputNodeModel<>).MakeGenericType(inputType);
+        CreateAndAddNode(typeof(InputNodeView), inputModelType, new Vector2(-300, 0), false, false);
+    }
+
     public string filePath = "";
+    private Type inputType = null;
 
     private ConnectionsController connectionsController = new ConnectionsController();
     private List<INodeEditorDrawable> drawables = new List<INodeEditorDrawable>();
@@ -69,7 +91,7 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
 
     private Vector2 origin = new Vector2();
     private Vector2 viewport = new Vector2();
-    private float scale = 1;
+    private float scale = 0.6f;
 
     private NodeSocketView currentViewSelected = null;
 
@@ -81,6 +103,7 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
     protected void OnEnable()
     {
         origin = position.size * 0.5f;
+        viewport = new Vector2(origin.x, origin.y);
         wantsMouseMove = true;
     }
 
@@ -125,7 +148,7 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
     {
         CleanEditor();
         XmlObjectReferences references = new XmlObjectReferences();
-        GenericNodeEditorSavedData data = new GenericNodeEditorSavedData();
+        GenericNodesSaveData data = new GenericNodesSaveData();
         references.Loading_LoadContainer(data, filePath);
 
         connectionsController = data.ConnectionController;
@@ -140,12 +163,14 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
             ConnectionModel cm = connectionsController.AllConnections[i];
             CreateConnectionView(cm, modelsToViewsMap[cm.InputSocket.ParentNode].GetSocketView(cm.InputSocket), modelsToViewsMap[cm.OutputSocket.ParentNode].GetSocketView(cm.OutputSocket));
         }
+        SetScale(scale);
+        SetViewportPosition(viewport);
     }
 
     public void Save()
     {
         XmlObjectReferences references = new XmlObjectReferences();
-        GenericNodeEditorSavedData data = new GenericNodeEditorSavedData();
+        GenericNodesSaveData data = new GenericNodesSaveData();
 
         // Setting Data to save
         data.ConnectionModels = connectionsController.AllConnections;
@@ -165,10 +190,13 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         data.NodeModels = models.ToArray();
         data.NodeSockets = socketModels.ToArray();
         data.ConnectionController = connectionsController;
+        data.InputType = new TypeSaveable(inputType);
         // End setting data to save
 
-        references.Saving_SaveContainer(data, filePath);
+        references.Saving_SaveContainer(data, filePath, GenericNodesSaveData.DATA_ROOT_TAG);
         AssetDatabase.Refresh();
+        SetScale(scale);
+        SetViewportPosition(viewport);
     }
 
     // Registering
@@ -290,10 +318,10 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         gm.ShowAsContext();
     }
 
-    private BaseNodeView CreateAndAddNode(Type viewType, Type modelType, Vector2 position, bool canBeRemoved)
+    private BaseNodeView CreateAndAddNode(Type viewType, Type modelType, Vector2 position, bool canBeRemoved, bool toViewPosition = true)
     {
         BaseNodeModel model = (BaseNodeModel)Activator.CreateInstance(modelType, new object[] { connectionsController }); 
-        BaseNodeView nv = CreateNodeViewOfType(viewType, model, ToViewportPosition(position) , canBeRemoved );
+        BaseNodeView nv = CreateNodeViewOfType(viewType, model, (toViewPosition) ? ToViewportPosition(position) : position , canBeRemoved );
         AddNode(nv);
         return nv;
     }
@@ -430,6 +458,47 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         for(int i = 0; i < allCurrentNodeViews.Length; i++)
         {
             RemoveNode(allCurrentNodeViews[i]);
+        }
+    }
+}
+
+
+public class GenericNodeEditorCreationMenu : EditorWindow
+{
+    private int selectedIndex = 0;
+
+    [MenuItem("Assets/Generic Node File")]
+    public static void OpenWindow()
+    {
+        GenericNodeEditorCreationMenu window = GetWindow<GenericNodeEditorCreationMenu>("Generic Node Creator", true);
+        window.minSize = window.maxSize = new Vector2(400, 200);
+        window.ShowPopup();
+    }
+
+    protected void OnGUI()
+    {
+        List<string> options = new List<string>();
+        options.Add("Select a Node Data Class");
+
+        Type[] bndrTypes = typeof(BaseNodeDataRunner).Assembly.GetTypes()
+            .Where(bndr => typeof(BaseNodeDataRunner).IsAssignableFrom(bndr) && !bndr.IsAbstract).ToArray();
+        
+        for(int i = 0; i < bndrTypes.Length; i++)
+        {
+            options.Add(bndrTypes[i].Name);
+        }
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Select a Node Data Class: ");
+        selectedIndex = EditorGUILayout.Popup(selectedIndex, options.ToArray());
+
+        if(GUI.Button(new Rect(position.width * 0.5f - 75, position.height * 0.7f - 30, 150, 60), new GUIContent("Create File")))
+        {
+            if (selectedIndex == 0) { return; }
+            Type selectedType = bndrTypes[selectedIndex - 1];
+            GenericNodeEditor.OpenWindow(Selection.activeObject.name, selectedType);
+            Close();
         }
     }
 }
