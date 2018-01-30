@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
-using System;
-using System.Xml;
 
 public class ViewportRect
 {

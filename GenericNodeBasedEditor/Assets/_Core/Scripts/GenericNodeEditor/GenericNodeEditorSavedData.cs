@@ -12,7 +12,7 @@ public class GenericNodeEditorSavedData : ISaveContainer
 
     // Saved Views
     // -- All Node visual data should be stored here
-    public BaseNodeView[] NodeViews;
+    public ViewData[] NodeViewData;
 
     // Saved Models
     // -- All Node Logic holders should be stored here
@@ -26,7 +26,7 @@ public class GenericNodeEditorSavedData : ISaveContainer
 
     public void SaveablesToLoad(object[] saveables)
     {
-        NodeViews = saveables.Where((s => typeof(BaseNodeView).IsAssignableFrom(s.GetType()))).Cast<BaseNodeView>().ToArray();
+        NodeViewData = saveables.Where((s => typeof(ViewData).IsAssignableFrom(s.GetType()))).Cast<ViewData>().ToArray();
         NodeModels = saveables.Where((s => typeof(BaseNodeModel).IsAssignableFrom(s.GetType()))).Cast<BaseNodeModel>().ToArray();
         ConnectionModels = saveables.Where((s => typeof(ConnectionModel).IsAssignableFrom(s.GetType()))).Cast<ConnectionModel>().ToArray();
         NodeSockets = saveables.Where((s => typeof(BaseNodeSocketModel).IsAssignableFrom(s.GetType()))).Cast<BaseNodeSocketModel>().ToArray();
@@ -35,7 +35,7 @@ public class GenericNodeEditorSavedData : ISaveContainer
 
     public ISaveable[] SaveablesToSave()
     {
-        List<ISaveable> saveables = new List<ISaveable>(NodeViews);
+        List<ISaveable> saveables = new List<ISaveable>(NodeViewData);
         saveables.AddRange(NodeModels);
         saveables.AddRange(NodeSockets);
         saveables.AddRange(ConnectionModels);

@@ -1,15 +1,17 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<GenericNodeEditorSavedData>
-  <Saveable ReferenceId="1" ObjectType="AdditionNodeView">
+<GNE_SaveFile ContainerType="GenericNodeEditorSavedData">
+  <Saveable ReferenceId="1" ObjectType="ViewData">
+    <NodeViewTypeString>AdditionNodeView</NodeViewTypeString>
     <RepresentingModel>2</RepresentingModel>
-    <X>318</X>
-    <Y>101</Y>
+    <X>556</X>
+    <Y>192</Y>
     <IsRemoveable>True</IsRemoveable>
   </Saveable>
-  <Saveable ReferenceId="3" ObjectType="IntegerNodeView">
+  <Saveable ReferenceId="3" ObjectType="ViewData">
+    <NodeViewTypeString>IntegerNodeView</NodeViewTypeString>
     <RepresentingModel>4</RepresentingModel>
-    <X>-94</X>
-    <Y>313</Y>
+    <X>63</X>
+    <Y>241</Y>
     <IsRemoveable>True</IsRemoveable>
   </Saveable>
   <Saveable ReferenceId="2" ObjectType="AdditionNodeModel">
@@ -27,7 +29,7 @@
     <Sockets>
       <Socket>11</Socket>
     </Sockets>
-    <Value>143112</Value>
+    <Value>50</Value>
   </Saveable>
   <Saveable ReferenceId="5" ObjectType="InputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
     <SocketIndex>0</SocketIndex>
@@ -78,10 +80,10 @@
     <MaxConnectionsAmount>-101</MaxConnectionsAmount>
   </Saveable>
   <Saveable ReferenceId="12" ObjectType="ConnectionModel">
-    <InputSocketReference>7</InputSocketReference>
+    <InputSocketReference>6</InputSocketReference>
     <OutputSocketReference>11</OutputSocketReference>
   </Saveable>
   <Saveable ReferenceId="10" ObjectType="ConnectionsController">
     <ConnectionModelReference>12</ConnectionModelReference>
   </Saveable>
-</GenericNodeEditorSavedData>
+</GNE_SaveFile>

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Xml;
 
-public abstract class BaseNodeView : INodeEditorDrawable, ISaveable
+public abstract class BaseNodeView : INodeEditorDrawable
 {
     public const int SOCKET_HEIGHT = 35;
     public const int SOCKET_WIDTH = 30;
@@ -16,6 +16,7 @@ public abstract class BaseNodeView : INodeEditorDrawable, ISaveable
     public ViewportRect ViewportRect { get; private set; }
     public bool IsBeingDragged { get; private set; }
     public bool CanBeRemoved { get; private set; }
+    public ViewData ViewData { get; private set; }
 
     private Action<BaseNodeView> removeNodeCallbacks;
     private Action<BaseNodeView> resetConnectionsCallbacks;
@@ -25,11 +26,6 @@ public abstract class BaseNodeView : INodeEditorDrawable, ISaveable
     private Color nodeColor;
 
     private Vector2 sceneStartPosition;
-
-    public BaseNodeView()
-    {
-        Initization();
-    }
 
     public BaseNodeView(BaseNodeModel modelToRepresent, Vector2 position, IOriginScene scene, bool canBeRemoved)
     {
@@ -60,8 +56,9 @@ public abstract class BaseNodeView : INodeEditorDrawable, ISaveable
         int na = Mathf.Max(NodeModel.InputSockets.Length, NodeModel.OutputSockets.Length);
         float height = Mathf.Clamp((SOCKET_HEIGHT * na) + (SOCKET_OFFSET * na), 100, float.PositiveInfinity);
         ViewportRect = new ViewportRect(new Rect(sceneStartPosition.x, sceneStartPosition.y, 300, height), scene);
+        ViewData = new ViewData(GetType(), NodeModel, ViewportRect, CanBeRemoved);
 
-        if(socketViews == null)
+        if (socketViews == null)
             CreateSocketViews();
     }
 
@@ -211,50 +208,9 @@ public abstract class BaseNodeView : INodeEditorDrawable, ISaveable
         gm.ShowAsContext();
     }
 
-    public void Save(XmlDocument doc, XmlObjectReferences references, XmlElement saveableElement)
-    {
-        XmlElement modelRepresentingElement = doc.CreateElement("RepresentingModel");
-        XmlElement xPosElement = doc.CreateElement("X");
-        XmlElement yPosElement = doc.CreateElement("Y");
-        XmlElement isRemoveableElement = doc.CreateElement("IsRemoveable");
-
-        modelRepresentingElement.AppendChild(doc.CreateTextNode(references.Saving_GetRefCounterFor(NodeModel).ToString()));
-        xPosElement.AppendChild(doc.CreateTextNode(ViewportRect.Rect.position.x.ToString()));
-        yPosElement.AppendChild(doc.CreateTextNode(ViewportRect.Rect.position.y.ToString()));
-        isRemoveableElement.AppendChild(doc.CreateTextNode(CanBeRemoved.ToString()));
-
-        saveableElement.AppendChild(modelRepresentingElement);
-        saveableElement.AppendChild(xPosElement);
-        saveableElement.AppendChild(yPosElement);
-        saveableElement.AppendChild(isRemoveableElement);
-    }
-
-    public void Load(XmlElement savedData, XmlObjectReferences references)
-    {
-        float xPos = float.Parse(savedData.GetSingleDataFrom("X"));
-        float yPos = float.Parse(savedData.GetSingleDataFrom("Y"));
-        CanBeRemoved = bool.Parse(savedData.GetSingleDataFrom("IsRemoveable"));
-        sceneStartPosition = new Vector2(xPos, yPos);
-
-        uint nodeModelReference = uint.Parse(savedData.GetSingleDataFrom("RepresentingModel"));
-        references.Loading_GetReferenceFrom(nodeModelReference, OnNodeModelLoaded);
-    }
-
-    private void OnNodeModelLoaded(uint referenceId, object nodeModelInstance)
-    {
-        NodeModel = (BaseNodeModel)nodeModelInstance;
-        NodeModel.ModelInputReceivedDataEvent += OnModelInputReceivedDataEvent;
-        NodeModel.NodeConnectedAsEvent += OnNodeConnectedAs;
-    }
-
     private void Initization()
     {
         ColorUtility.TryParseHtmlString("#607D8B", out nodeColor);
-    }
-
-    public void AllDataLoaded()
-    {
-
     }
 }
 

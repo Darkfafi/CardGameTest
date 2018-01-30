@@ -1,14 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
 using System.IO;
+using System.Xml;
 
 public class BaseGenericNodeEditor : EditorWindow, IOriginScene
 {
-    public const string EDITOR_EXTENSION = ".gne";
+    public const string EDITOR_EXTENSION = ".xml";
 
     public Vector2 SceneOrigin
     {
@@ -31,15 +31,20 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
     public static bool OnOpenAsset(int instanceID, int line)
     {
         Debug.Log(Selection.activeObject.GetType());
-        DefaultAsset da = Selection.activeObject as DefaultAsset;
+        TextAsset ta = Selection.activeObject as TextAsset;
         
-        if (da != null)
+        if (ta != null)
         {
-            string path = AssetDatabase.GetAssetPath(da);
+            string path = AssetDatabase.GetAssetPath(ta);
             if(Path.GetExtension(path) == EDITOR_EXTENSION)
             {
-                CreateWindow(path).Load();
-                return true;
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(ta.text);
+                if (doc.GetElementsByTagName(XmlObjectReferencesExtensions.ROOT_TAG).Count > 0)
+                {
+                    CreateWindow(path).Load();
+                    return true;
+                }
             }
         }
 
@@ -125,10 +130,9 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
 
         connectionsController = data.ConnectionController;
 
-        for (int i = 0; i < data.NodeViews.Length; i++)
+        for (int i = 0; i < data.NodeViewData.Length; i++)
         {
-            data.NodeViews[i].SetScene(this);
-            AddNode(data.NodeViews[i]);
+            CreateAndAddNode(data.NodeViewData[i]).SetScene(this);
         }
 
         for (int i = 0; i < connectionsController.AllConnections.Length; i++)
@@ -145,17 +149,17 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
 
         // Setting Data to save
         data.ConnectionModels = connectionsController.AllConnections;
-        data.NodeViews = drawables.Where((d => typeof(BaseNodeView).IsAssignableFrom(d.GetType()))).Cast<BaseNodeView>().ToArray();
+        data.NodeViewData = drawables.Where((d => typeof(BaseNodeView).IsAssignableFrom(d.GetType()))).Cast<BaseNodeView>().Select(x=> x.ViewData).ToArray();
 
         List<BaseNodeModel> models = new List<BaseNodeModel>();
         List<BaseNodeSocketModel> socketModels = new List<BaseNodeSocketModel>();
 
-        for (int i = 0; i < data.NodeViews.Length; i++)
+        for (int i = 0; i < data.NodeViewData.Length; i++)
         {
-            models.Add(data.NodeViews[i].NodeModel);
+            models.Add(data.NodeViewData[i].NodeModel);
 
-            socketModels.AddRange(data.NodeViews[i].NodeModel.InputSockets);
-            socketModels.AddRange(data.NodeViews[i].NodeModel.OutputSockets);
+            socketModels.AddRange(data.NodeViewData[i].NodeModel.InputSockets);
+            socketModels.AddRange(data.NodeViewData[i].NodeModel.OutputSockets);
         }
 
         data.NodeModels = models.ToArray();
@@ -286,11 +290,25 @@ public class BaseGenericNodeEditor : EditorWindow, IOriginScene
         gm.ShowAsContext();
     }
 
-    private void CreateAndAddNode(Type viewType, Type modelType, Vector2 position, bool canBeRemoved)
+    private BaseNodeView CreateAndAddNode(Type viewType, Type modelType, Vector2 position, bool canBeRemoved)
     {
         BaseNodeModel model = (BaseNodeModel)Activator.CreateInstance(modelType, new object[] { connectionsController }); 
-        BaseNodeView nv = (BaseNodeView)Activator.CreateInstance(viewType, new object[] { model, ToViewportPosition(position), this , canBeRemoved });
+        BaseNodeView nv = CreateNodeViewOfType(viewType, model, ToViewportPosition(position) , canBeRemoved );
         AddNode(nv);
+        return nv;
+    }
+
+    public BaseNodeView CreateAndAddNode(ViewData nodeViewData)
+    {
+        Type viewType = Type.GetType(nodeViewData.NodeViewType);
+        BaseNodeView nv = CreateNodeViewOfType(viewType, nodeViewData.NodeModel, nodeViewData.LoadedPosition, nodeViewData.IsRemoveable);
+        AddNode(nv);
+        return nv;
+    }
+
+    private BaseNodeView CreateNodeViewOfType(Type viewType, BaseNodeModel model, Vector2 pos, bool canBeRemoved)
+    {
+        return (BaseNodeView)Activator.CreateInstance(viewType, new object[] { model, pos, this, canBeRemoved });
     }
 
     private void AddNode(BaseNodeView nodeView)

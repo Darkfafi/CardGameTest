@@ -141,9 +141,12 @@ public class XmlObjectReferences
 
 public static class XmlObjectReferencesExtensions
 {
+    public const string ROOT_TAG = "GNE_SaveFile";
     public const string SAVEABLE_TAG = "Saveable";
-    public const string REFERENCE_ID_TAG = "ReferenceId";
-    public const string OBJECT_TYPE_TAG = "ObjectType";
+
+    public const string REFERENCE_ID_ATTR = "ReferenceId";
+    public const string OBJECT_TYPE_ATTR = "ObjectType";
+    public const string CONTAINER_TYPE_ATTR = "ContainerType";
 
     /// <summary>
     /// Saves the returned content of the container to the given path as Xml file & Ends the Saver
@@ -162,13 +165,14 @@ public static class XmlObjectReferencesExtensions
 
         ISaveable[] saveables = container.SaveablesToSave();
 
-        XmlElement containerElement = doc.CreateElement(container.GetType().Name);
+        XmlElement containerElement = doc.CreateElement( ROOT_TAG );
+        containerElement.SetAttribute( CONTAINER_TYPE_ATTR , container.GetType().FullName);
 
         for (int i = 0; i < saveables.Length; i++)
         {
             XmlElement saveableElement = doc.CreateElement(SAVEABLE_TAG);
-            saveableElement.SetAttribute(REFERENCE_ID_TAG, references.Saving_UseRefCounter(saveables[i]).ToString());
-            saveableElement.SetAttribute(OBJECT_TYPE_TAG, saveables[i].GetType().FullName.ToString());
+            saveableElement.SetAttribute(REFERENCE_ID_ATTR, references.Saving_UseRefCounter(saveables[i]).ToString());
+            saveableElement.SetAttribute(OBJECT_TYPE_ATTR, saveables[i].GetType().FullName.ToString());
             saveables[i].Save(doc, references, saveableElement);
             containerElement.AppendChild(saveableElement);
         }
@@ -200,7 +204,7 @@ public static class XmlObjectReferencesExtensions
         for (int i = 0; i < list.Count; i++)
         {
             ISaveable saveable = null;
-            Type type = Type.GetType(list.Item(i).Attributes.GetNamedItem(OBJECT_TYPE_TAG).Value);
+            Type type = Type.GetType(list.Item(i).Attributes.GetNamedItem(OBJECT_TYPE_ATTR).Value);
 
             try
             {
@@ -215,7 +219,7 @@ public static class XmlObjectReferencesExtensions
             saveablesCreated.Add(saveable);
             XmlElement saveableXml = GetElement(list.Item(i).OuterXml);
             saveable.Load(saveableXml, references);
-            references.Loading_SetRefCounterFor(saveable, uint.Parse(saveableXml.GetAttribute( REFERENCE_ID_TAG )));
+            references.Loading_SetRefCounterFor(saveable, uint.Parse(saveableXml.GetAttribute( REFERENCE_ID_ATTR )));
         }
 
         reader.Close();
