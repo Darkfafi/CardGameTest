@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
-using UnityEngine;
 
 public class InputNodeModel<Output> : BaseFlowNodeModel
 {
@@ -26,15 +23,19 @@ public class InputNodeModel<Output> : BaseFlowNodeModel
 
     protected override void ConstructSockets()
     {
-        if(typeof(Output) != typeof(ConnectionModel))
+        if(typeof(Output) != typeof(EmptyData))
             output = AddOutputSocket(OnOutputRequestMethod, ConnectionsController.INFINITE_CONNECTIONS_AMOUNT);
     }
 
     public void Run(Output data)
     {
-        // When run, pass flow to the next flow node
-        this.data = data;
-        SendAllOutput();
+        if (typeof(Output) != typeof(EmptyData))
+        {
+            this.data = data;
+            SendAllOutput();
+        }
+
+        SafeNextNodeFlowRequest();
     }
 
     private Output OnOutputRequestMethod()
@@ -44,25 +45,20 @@ public class InputNodeModel<Output> : BaseFlowNodeModel
 
     protected override void DataReceivedFromInputSocket(object data)
     {
-        if (typeof(Output) != typeof(ConnectionModel))
+        if (typeof(Output) != typeof(EmptyData))
             output.SendOutputData(connectionsController);
     }
 
     protected override void OnAllDataLoaded()
     {
-        if (typeof(Output) != typeof(ConnectionModel))
+        if (typeof(Output) != typeof(EmptyData))
         {
             output = GetLoadedOutputSocket(0, OnOutputRequestMethod);
             output.SendOutputData(connectionsController);
         }
     }
 
-    protected override void OnSelectedAsCurrentFlowNode(BaseFlowNodeModel previousFlowNode)
-    {
-
-    }
-
-    protected override void OnUnselectedAsCurrentFlowNode()
+    protected override void SpecificSave(XmlDocument doc, XmlObjectReferences references, XmlElement saveableElement)
     {
 
     }
@@ -72,7 +68,12 @@ public class InputNodeModel<Output> : BaseFlowNodeModel
 
     }
 
-    protected override void SpecificSave(XmlDocument doc, XmlObjectReferences references, XmlElement saveableElement)
+    protected override void OnSelectedAsCurrentFlowNode(BaseFlowNodeModel previousFlowNode)
+    {
+
+    }
+
+    protected override void OnUnselectedAsCurrentFlowNode()
     {
 
     }

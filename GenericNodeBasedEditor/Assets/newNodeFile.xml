@@ -3,20 +3,72 @@
   <Saveable ReferenceId="1" ObjectType="ViewData">
     <NodeViewTypeString>InputNodeView</NodeViewTypeString>
     <RepresentingModel>2</RepresentingModel>
-    <X>-300</X>
-    <Y>0</Y>
+    <X>-275.0002</X>
+    <Y>-165</Y>
     <IsRemoveable>False</IsRemoveable>
   </Saveable>
-  <Saveable ReferenceId="3" ObjectType="TypeSaveable">
-    <TypeName>ConnectionModel</TypeName>
+  <Saveable ReferenceId="3" ObjectType="ViewData">
+    <NodeViewTypeString>AdditionNodeView</NodeViewTypeString>
+    <RepresentingModel>4</RepresentingModel>
+    <X>211.6667</X>
+    <Y>-135</Y>
+    <IsRemoveable>True</IsRemoveable>
   </Saveable>
-  <Saveable ReferenceId="2" ObjectType="InputNodeModel`1[[ConnectionModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
-    <ConnectionsControllerReference>5</ConnectionsControllerReference>
+  <Saveable ReferenceId="5" ObjectType="ViewData">
+    <NodeViewTypeString>AdditionNodeView</NodeViewTypeString>
+    <RepresentingModel>6</RepresentingModel>
+    <X>660.0001</X>
+    <Y>-120.0001</Y>
+    <IsRemoveable>True</IsRemoveable>
+  </Saveable>
+  <Saveable ReferenceId="7" ObjectType="ViewData">
+    <NodeViewTypeString>AdditionNodeView</NodeViewTypeString>
+    <RepresentingModel>8</RepresentingModel>
+    <X>711.6665</X>
+    <Y>110</Y>
+    <IsRemoveable>True</IsRemoveable>
+  </Saveable>
+  <Saveable ReferenceId="9" ObjectType="TypeSaveable">
+    <TypeName>System.Int32</TypeName>
+  </Saveable>
+  <Saveable ReferenceId="2" ObjectType="InputNodeModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <ConnectionsControllerReference>12</ConnectionsControllerReference>
     <Sockets>
-      <Socket>4</Socket>
+      <Socket>10</Socket>
+      <Socket>11</Socket>
     </Sockets>
   </Saveable>
-  <Saveable ReferenceId="4" ObjectType="OutputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+  <Saveable ReferenceId="4" ObjectType="AdditionNodeModel">
+    <ConnectionsControllerReference>12</ConnectionsControllerReference>
+    <Sockets>
+      <Socket>13</Socket>
+      <Socket>14</Socket>
+      <Socket>15</Socket>
+      <Socket>16</Socket>
+      <Socket>17</Socket>
+    </Sockets>
+  </Saveable>
+  <Saveable ReferenceId="6" ObjectType="AdditionNodeModel">
+    <ConnectionsControllerReference>12</ConnectionsControllerReference>
+    <Sockets>
+      <Socket>18</Socket>
+      <Socket>19</Socket>
+      <Socket>20</Socket>
+      <Socket>21</Socket>
+      <Socket>22</Socket>
+    </Sockets>
+  </Saveable>
+  <Saveable ReferenceId="8" ObjectType="AdditionNodeModel">
+    <ConnectionsControllerReference>12</ConnectionsControllerReference>
+    <Sockets>
+      <Socket>23</Socket>
+      <Socket>24</Socket>
+      <Socket>25</Socket>
+      <Socket>26</Socket>
+      <Socket>27</Socket>
+    </Sockets>
+  </Saveable>
+  <Saveable ReferenceId="10" ObjectType="OutputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
     <SocketIndex>0</SocketIndex>
     <ParentNodeReference>2</ParentNodeReference>
     <SocketModelType>1</SocketModelType>
@@ -24,5 +76,179 @@
     <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
     <MaxConnectionsAmount>1</MaxConnectionsAmount>
   </Saveable>
-  <Saveable ReferenceId="5" ObjectType="ConnectionsController" />
+  <Saveable ReferenceId="11" ObjectType="OutputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>2</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="13" ObjectType="InputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>4</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="14" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>4</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="15" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>2</SocketIndex>
+    <ParentNodeReference>4</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="16" ObjectType="OutputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>4</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="17" ObjectType="OutputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>4</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="18" ObjectType="InputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>6</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="19" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>6</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="20" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>2</SocketIndex>
+    <ParentNodeReference>6</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="21" ObjectType="OutputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>6</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="22" ObjectType="OutputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>6</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="23" ObjectType="InputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>8</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="24" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>8</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="25" ObjectType="InputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>2</SocketIndex>
+    <ParentNodeReference>8</ParentNodeReference>
+    <SocketModelType>0</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="26" ObjectType="OutputSocketModel`1[[BaseFlowNodeModel, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]">
+    <SocketIndex>0</SocketIndex>
+    <ParentNodeReference>8</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>1</SocketDataType>
+    <SocketStreamingType>BaseFlowNodeModel</SocketStreamingType>
+    <MaxConnectionsAmount>1</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="27" ObjectType="OutputSocketModel`1[[System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]">
+    <SocketIndex>1</SocketIndex>
+    <ParentNodeReference>8</ParentNodeReference>
+    <SocketModelType>1</SocketModelType>
+    <SocketDataType>0</SocketDataType>
+    <SocketStreamingType>System.Int32</SocketStreamingType>
+    <MaxConnectionsAmount>-101</MaxConnectionsAmount>
+  </Saveable>
+  <Saveable ReferenceId="28" ObjectType="ConnectionModel">
+    <InputSocketReference>14</InputSocketReference>
+    <OutputSocketReference>11</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="29" ObjectType="ConnectionModel">
+    <InputSocketReference>15</InputSocketReference>
+    <OutputSocketReference>11</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="30" ObjectType="ConnectionModel">
+    <InputSocketReference>13</InputSocketReference>
+    <OutputSocketReference>10</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="31" ObjectType="ConnectionModel">
+    <InputSocketReference>18</InputSocketReference>
+    <OutputSocketReference>16</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="32" ObjectType="ConnectionModel">
+    <InputSocketReference>19</InputSocketReference>
+    <OutputSocketReference>17</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="33" ObjectType="ConnectionModel">
+    <InputSocketReference>20</InputSocketReference>
+    <OutputSocketReference>17</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="34" ObjectType="ConnectionModel">
+    <InputSocketReference>24</InputSocketReference>
+    <OutputSocketReference>17</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="35" ObjectType="ConnectionModel">
+    <InputSocketReference>25</InputSocketReference>
+    <OutputSocketReference>22</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="36" ObjectType="ConnectionModel">
+    <InputSocketReference>23</InputSocketReference>
+    <OutputSocketReference>21</OutputSocketReference>
+  </Saveable>
+  <Saveable ReferenceId="12" ObjectType="ConnectionsController">
+    <ConnectionModelReference>28</ConnectionModelReference>
+    <ConnectionModelReference>29</ConnectionModelReference>
+    <ConnectionModelReference>30</ConnectionModelReference>
+    <ConnectionModelReference>31</ConnectionModelReference>
+    <ConnectionModelReference>32</ConnectionModelReference>
+    <ConnectionModelReference>33</ConnectionModelReference>
+    <ConnectionModelReference>34</ConnectionModelReference>
+    <ConnectionModelReference>35</ConnectionModelReference>
+    <ConnectionModelReference>36</ConnectionModelReference>
+  </Saveable>
 </GNE_SaveFile>

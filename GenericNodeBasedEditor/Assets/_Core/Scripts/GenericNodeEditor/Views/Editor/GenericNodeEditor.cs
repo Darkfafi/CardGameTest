@@ -22,9 +22,18 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
     {
         Type inputType = null;
 
-        if(runnableType.IsDefined(typeof(NodeInputDataAttribute), false))
+        Type genericType = runnableType;
+
+        while(!genericType.IsGenericType)
         {
-            inputType = ((NodeInputDataAttribute)runnableType.GetCustomAttributes(typeof(NodeInputDataAttribute), false)[0]).InputDataType;
+            genericType = genericType.BaseType;
+        }
+
+        inputType = genericType.GetGenericArguments()[0];
+
+        if (inputType.GetType() == typeof(EmptyData))
+        {
+            inputType = null;
         }
 
         string path = AssetDatabase.GenerateUniqueAssetPath(activeObjectName + "/newNodeFile" + EDITOR_EXTENSION);
@@ -62,11 +71,6 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
         bgne.filePath = path;
         bgne.inputType = inputType;
 
-        if(bgne.inputType == null)
-        {
-            bgne.inputType = typeof(ConnectionModel);
-        }
-
         bgne.ShowPopup();
         if (isNewFile)
             bgne.FileCreatedCall();
@@ -76,7 +80,9 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
 
     private void FileCreatedCall()
     {
-        Type inputModelType = typeof(InputNodeModel<>).MakeGenericType(inputType);
+        Type inputModelType;
+        inputModelType = typeof(InputNodeModel<>).MakeGenericType(inputType);
+
         CreateAndAddNode(typeof(InputNodeView), inputModelType, new Vector2(-300, 0), false, false);
     }
 
@@ -480,8 +486,8 @@ public class GenericNodeEditorCreationMenu : EditorWindow
         List<string> options = new List<string>();
         options.Add("Select a Node Data Class");
 
-        Type[] bndrTypes = typeof(BaseNodeDataRunner).Assembly.GetTypes()
-            .Where(bndr => typeof(BaseNodeDataRunner).IsAssignableFrom(bndr) && !bndr.IsAbstract).ToArray();
+        Type[] bndrTypes = typeof(INodeDataRunner).Assembly.GetTypes()
+            .Where(bndr => typeof(INodeDataRunner).IsAssignableFrom(bndr) && !bndr.IsAbstract).ToArray();
         
         for(int i = 0; i < bndrTypes.Length; i++)
         {

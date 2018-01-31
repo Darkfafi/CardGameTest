@@ -9,6 +9,9 @@ public class NodeSocketView : INodeEditorDrawable
     public ViewportRect ViewportRect { get; private set; }
     public BaseNodeView ParentNodeView { get; private set; }
     public int Index { get; private set; }
+    public Color ViewColor { get { return viewColor; } }
+    private Color viewColor;
+
 
     private GUIStyle style;
 
@@ -32,9 +35,8 @@ public class NodeSocketView : INodeEditorDrawable
         {
             style = new GUIStyle(GUI.skin.button);
             string cHex = GetColorForSocket();
-            Color c;
-            ColorUtility.TryParseHtmlString(cHex, out c);
-            style.normal.background = GenerateTexture(128, 128, c);
+            ColorUtility.TryParseHtmlString(cHex, out viewColor);
+            style.normal.background = GenerateTexture(128, 128, ViewColor);
             style.normal.textColor = new Color(1, 0.98f, 230f / 255f);
         }
 

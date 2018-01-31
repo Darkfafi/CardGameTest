@@ -63,7 +63,7 @@ public class ConnectionView : INodeEditorDrawable
         tB.x += 50;
         tB.y -= 50;
 
-        DrawConnectionLine(posA, posB, tA, tB, Color.white, 8 * ViewportRect.Scale);
+        DrawConnectionLine(posA, posB, tA, tB, viewInput.ViewColor + (Color.white * 0.3f), 8 * ViewportRect.Scale);
     }
 
     public void HandleEvents(Event e)

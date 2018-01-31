@@ -3,34 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public abstract class BaseNodeDataRunner : MonoBehaviour
+public abstract class BaseNodeDataRunner<Input> : MonoBehaviour, INodeDataRunner
 {
     [SerializeField]
     private TextAsset gneFile;
 
-    private NodeDataExecuter executer;
+    private NodeDataExecuter<Input> executer;
 
-    protected void Awake()
+    public void Run(Input data)
+    {
+        executer.Run(data);
+    }
+
+    protected virtual void Awake()
     {
         if(!GenericNodesSaveData.IsValidFile(gneFile))
         {
-            throw new System.InvalidOperationException("The File Must be a Generic Node Editor File!");
+            throw new InvalidOperationException("The File Must be a Generic Node Editor File!");
         }
         XmlObjectReferences refs = new XmlObjectReferences();
 
         GenericNodesSaveData data = new GenericNodesSaveData();
         refs.Loading_LoadContainerWithXml(data, gneFile.text);
-        executer = new NodeDataExecuter(data);
+        executer = new NodeDataExecuter<Input>(data);
+    }
+
+    protected void OnDestroy()
+    {
+        executer.Clean();
+        executer = null;
     }
 }
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public class NodeInputDataAttribute : Attribute
+public interface INodeDataRunner
 {
-    public Type InputDataType { get; private set; }
 
-    public NodeInputDataAttribute(Type inputDataType)
-    {
-        InputDataType = inputDataType;
-    }
+}
+
+public struct EmptyData
+{
+
 }

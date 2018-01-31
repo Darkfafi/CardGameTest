@@ -26,6 +26,7 @@ public class InputNodeView : BaseNodeView
 
     protected override void OnDraw()
     {
+        GUI.Box(new Rect(ViewportRect.GetViewportPositionCenter() - ViewportRect.GetViewportSize() * 0.3f, ViewportRect.GetViewportSize() * 0.6f), "Entry Point", GUI.skin.box);
 
     }
 

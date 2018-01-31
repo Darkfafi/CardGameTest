@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
+using System.Linq;
 
 public enum FlowNodeType
 {
@@ -13,6 +14,9 @@ public enum FlowNodeType
 
 public abstract class BaseFlowNodeModel : BaseNodeModel
 {
+    public event Action RequestNextNodeFlowEvent;
+    public event Action RequestPreviousNodeFlowEvent;
+
     public abstract FlowNodeType NodeFlowType { get; }
 
     private const string inputMethodName = "InternalAddInputSocket";
@@ -35,6 +39,22 @@ public abstract class BaseFlowNodeModel : BaseNodeModel
         OnUnselectedAsCurrentFlowNode();
     }
 
+    public BaseFlowNodeModel NextFlowNode(ConnectionsController connections)
+    {
+        if (NodeFlowType == FlowNodeType.InFlow) { return null; } // If there is no next node connectable
+        BaseNodeSocketModel[] nsm = connections.GetInputsConnectedToOutput(OutputSockets[0]);
+        if (nsm.Length == 0) { return null; }
+        return nsm[0].ParentNode as BaseFlowNodeModel;
+    }
+
+    public BaseFlowNodeModel[] PreviousFlowNodes(ConnectionsController connections)
+    {
+        if (NodeFlowType == FlowNodeType.OutFlow) { return new BaseFlowNodeModel[] { }; } // If there is no previous node connectable
+        BaseNodeSocketModel[] nsm = connections.GetOutputsConnectedToInput(InputSockets[0]);
+        if (nsm.Length == 0) { return new BaseFlowNodeModel[] { }; }
+        return nsm.Select(n => n.ParentNode).Cast<BaseFlowNodeModel>().ToArray();
+    }
+
     protected override InputSocketModel<T> GetLoadedInputSocket<T>(int index)
     {
         index = (NodeFlowType == FlowNodeType.InFlow || NodeFlowType == FlowNodeType.InOutFlow) ? index + 1 : index;
@@ -45,6 +65,22 @@ public abstract class BaseFlowNodeModel : BaseNodeModel
     {
         index = (NodeFlowType == FlowNodeType.OutFlow || NodeFlowType == FlowNodeType.InOutFlow) ? index + 1 : index;
         return base.GetLoadedOutputSocket<T>(index, outputRequestMethod);
+    }
+
+    protected void SafeNextNodeFlowRequest()
+    {
+        if(RequestNextNodeFlowEvent != null)
+        {
+            RequestNextNodeFlowEvent();
+        }
+    }
+
+    protected void SafePreviousNodeFlowRequest()
+    {
+        if (RequestPreviousNodeFlowEvent != null)
+        {
+            RequestPreviousNodeFlowEvent();
+        }
     }
 
     protected abstract void OnSelectedAsCurrentFlowNode(BaseFlowNodeModel previousFlowNode);
