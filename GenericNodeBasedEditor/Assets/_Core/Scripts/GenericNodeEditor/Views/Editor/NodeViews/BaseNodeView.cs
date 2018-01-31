@@ -12,6 +12,7 @@ public abstract class BaseNodeView : INodeEditorDrawable
     public const int SOCKET_OFFSET = 7;
 
     public event Action<NodeSocketView> NodeSocketClickedEvent;
+    public string Title { get; private set; }
     public BaseNodeModel NodeModel { get; private set; }
     public ViewportRect ViewportRect { get; private set; }
     public bool IsBeingDragged { get; private set; }
@@ -27,15 +28,20 @@ public abstract class BaseNodeView : INodeEditorDrawable
 
     private Vector2 sceneStartPosition;
 
-    public BaseNodeView(BaseNodeModel modelToRepresent, Vector2 position, IOriginScene scene, bool canBeRemoved)
+    private bool initialized = false;
+
+    public void Initialize(BaseNodeModel modelToRepresent, Vector2 position, IOriginScene scene, bool canBeRemoved, string title)
     {
+        if (initialized) { return; }
         CanBeRemoved = canBeRemoved;
         NodeModel = modelToRepresent;
         NodeModel.ModelInputReceivedDataEvent += OnModelInputReceivedDataEvent;
         NodeModel.NodeConnectedAsEvent += OnNodeConnectedAs;
         Initization();
         sceneStartPosition = position;
+        Title = title;
         SetScene(scene);
+        initialized = true;
     }
 
     public NodeSocketView GetSocketView(BaseNodeSocketModel model)
@@ -56,7 +62,7 @@ public abstract class BaseNodeView : INodeEditorDrawable
         int na = Mathf.Max(NodeModel.InputSockets.Length, NodeModel.OutputSockets.Length);
         float height = Mathf.Clamp((SOCKET_HEIGHT * na) + (SOCKET_OFFSET * na), 100, float.PositiveInfinity);
         ViewportRect = new ViewportRect(new Rect(sceneStartPosition.x, sceneStartPosition.y, 300, height), scene);
-        ViewData = new ViewData(GetType(), NodeModel, ViewportRect, CanBeRemoved);
+        ViewData = new ViewData(GetType(), NodeModel, ViewportRect, CanBeRemoved, Title);
 
         if (socketViews == null)
             CreateSocketViews();
@@ -91,6 +97,18 @@ public abstract class BaseNodeView : INodeEditorDrawable
             sv.ViewportRect.Rect = r;
         }
 
+        Vector2 titlePos = new Vector2(ViewportRect.GetViewportPosition().x, ViewportRect.GetViewportPosition().y - 20);
+        Vector2 titleSize = new Vector2(100, 20);
+        GUI.color = new Color(0.55f, 0.95f, 0.55f);
+
+        ViewData.Title = GUI.TextField(new Rect(titlePos, titleSize), ViewData.Title, GUI.skin.box);
+
+        Vector2 dbPos = new Vector2(titlePos.x + ViewportRect.GetViewportSize().x - 20, ViewportRect.GetViewportPosition().y - titleSize.y);
+        Vector2 dbSize = new Vector2(20, titleSize.y);
+
+        GUI.color = NodeModel.DebugMode ? new Color(0.5f, 0.7f, 0.85f) : Color.white;
+        NodeModel.SetDebugMode(GUI.Toggle(new Rect(dbPos, dbSize), NodeModel.DebugMode, new GUIContent("D", "Debug Mode: " + (NodeModel.DebugMode ? "On" : "Off")), GUI.skin.button));
+        GUI.color = Color.white;
         OnDraw();
     }
 

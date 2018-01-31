@@ -44,7 +44,9 @@ public class AdditionNodeModel : BaseFlowNodeModel
 
     protected override void OnSelectedAsCurrentFlowNode(BaseFlowNodeModel previousFlowNode)
     {
-        Debug.Log(DoOperation().ToString() + " <-- Answer");
+        if(DebugMode)
+            Debug.Log(DoOperation().ToString() + " <-- Answer");
+
         SafeNextNodeFlowRequest();
     }
 

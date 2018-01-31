@@ -32,7 +32,15 @@ public class InputNodeModel<Output> : BaseFlowNodeModel
         if (typeof(Output) != typeof(EmptyData))
         {
             this.data = data;
+
+            if (DebugMode)
+                UnityEngine.Debug.Log("Data Set: " + data.ToString() + " | Type: " + data.GetType().Name);
+
             SendAllOutput();
+        }
+        else if (DebugMode)
+        {
+            UnityEngine.Debug.Log("Data Set: { Empty }");
         }
 
         SafeNextNodeFlowRequest();

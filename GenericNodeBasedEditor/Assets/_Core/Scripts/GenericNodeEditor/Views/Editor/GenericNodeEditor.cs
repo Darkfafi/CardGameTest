@@ -239,7 +239,7 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
     // Handling Events
     private void DrawablesInteractions(Event e)
     {
-        for (int i = 0; i < drawables.Count; i++)
+        for (int i = drawables.Count - 1; i >= 0; i--)
         {
             drawables[i].HandleEvents(e);
         }
@@ -286,7 +286,7 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
 
     private void SetScale(float scale)
     {
-        this.scale = Mathf.Clamp(scale, 0.25f, 1.25f);
+        this.scale = Mathf.Clamp(scale, 0.48f, 1.25f);
 
         for (int i = 0; i < drawables.Count; i++)
         {
@@ -327,7 +327,7 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
     private BaseNodeView CreateAndAddNode(Type viewType, Type modelType, Vector2 position, bool canBeRemoved, bool toViewPosition = true)
     {
         BaseNodeModel model = (BaseNodeModel)Activator.CreateInstance(modelType, new object[] { connectionsController }); 
-        BaseNodeView nv = CreateNodeViewOfType(viewType, model, (toViewPosition) ? ToViewportPosition(position) : position , canBeRemoved );
+        BaseNodeView nv = CreateNodeViewOfType(viewType, model, (toViewPosition) ? ToViewportPosition(position) : position , canBeRemoved, viewType.Name);
         AddNode(nv);
         return nv;
     }
@@ -335,14 +335,16 @@ public class GenericNodeEditor : EditorWindow, IOriginScene
     public BaseNodeView CreateAndAddNode(ViewData nodeViewData)
     {
         Type viewType = Type.GetType(nodeViewData.NodeViewType);
-        BaseNodeView nv = CreateNodeViewOfType(viewType, nodeViewData.NodeModel, nodeViewData.LoadedPosition, nodeViewData.IsRemoveable);
+        BaseNodeView nv = CreateNodeViewOfType(viewType, nodeViewData.NodeModel, nodeViewData.LoadedPosition, nodeViewData.IsRemoveable, nodeViewData.Title);
         AddNode(nv);
         return nv;
     }
 
-    private BaseNodeView CreateNodeViewOfType(Type viewType, BaseNodeModel model, Vector2 pos, bool canBeRemoved)
+    private BaseNodeView CreateNodeViewOfType(Type viewType, BaseNodeModel model, Vector2 pos, bool canBeRemoved, string title)
     {
-        return (BaseNodeView)Activator.CreateInstance(viewType, new object[] { model, pos, this, canBeRemoved });
+        BaseNodeView view = (BaseNodeView)Activator.CreateInstance(viewType);
+        view.Initialize(model, pos, this, canBeRemoved, title);
+        return view;
     }
 
     private void AddNode(BaseNodeView nodeView)

@@ -9,6 +9,7 @@ public abstract class BaseNodeModel : IModel, ISaveable
     public event Action<object> ModelInputReceivedDataEvent;
     public event Action<SocketModelType> NodeConnectedAsEvent;
 
+    public bool DebugMode { get; private set; }
     public BaseNodeSocketModel[] InputSockets { get { return inputSockets.ToArray(); } }
     public BaseNodeSocketModel[] OutputSockets { get { return outputSockets.ToArray(); } }
 
@@ -33,6 +34,11 @@ public abstract class BaseNodeModel : IModel, ISaveable
     {
         if (NodeConnectedAsEvent != null)
             NodeConnectedAsEvent(nodeRoleInConnection);
+    }
+
+    public void SetDebugMode(bool debugState)
+    {
+        DebugMode = debugState;
     }
 
     public void GetAllInput()
@@ -143,6 +149,7 @@ public abstract class BaseNodeModel : IModel, ISaveable
             sockets.AppendChild(socketElement);
         }
 
+        saveableElement.AppendChild(doc.CreateElementWithData("DebugMode", DebugMode.ToString()));
         saveableElement.AppendChild(doc.CreateElementWithData("ConnectionsControllerReference", references.Saving_GetRefCounterFor(connectionsController).ToString()));
 
         saveableElement.AppendChild(sockets);
@@ -152,6 +159,7 @@ public abstract class BaseNodeModel : IModel, ISaveable
     public void Load(XmlElement savedData, XmlObjectReferences references)
     {
         SpecificLoad(savedData, references);
+        DebugMode = bool.Parse(savedData.GetSingleDataFrom("DebugMode"));
         XmlNodeList socketNodesList = savedData.GetElementsByTagName("Socket");
         references.Loading_GetReferenceFrom(uint.Parse(savedData.GetSingleDataFrom("ConnectionsControllerReference")), OnConnectionsControllerLoaded);
 

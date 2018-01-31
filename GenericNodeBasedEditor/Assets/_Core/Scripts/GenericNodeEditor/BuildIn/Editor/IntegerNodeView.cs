@@ -6,12 +6,6 @@ using UnityEditor;
 [NodeViewForModel(typeof(IntegerNodeModel))]
 public class IntegerNodeView : BaseNodeView
 {
-
-    public IntegerNodeView(IntegerNodeModel modelToRepresent, Vector2 position, IOriginScene scene, bool canBeRemoved) : base(modelToRepresent, position, scene, canBeRemoved)
-    {
-
-    }
-
     protected override void ContextMenuAddition(GenericMenu gm)
     {
 

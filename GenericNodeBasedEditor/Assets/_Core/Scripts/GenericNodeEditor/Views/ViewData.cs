@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class ViewData : ISaveable
 {
+    public string Title;
     public string NodeViewType { get; private set; }
     public BaseNodeModel NodeModel { get; private set; }
     public ViewportRect ViewportRect { get; private set; }
@@ -14,9 +15,10 @@ public class ViewData : ISaveable
 
     public ViewData() { }
 
-    public ViewData(Type parentType, BaseNodeModel model, ViewportRect viewportRect, bool isRemoveable)
+    public ViewData(Type parentType, BaseNodeModel model, ViewportRect viewportRect, bool isRemoveable, string title)
     {
         NodeViewType = parentType.FullName;
+        Title = title;
         NodeModel = model;
         ViewportRect = viewportRect;
         LoadedPosition = viewportRect.Rect.position;
@@ -37,12 +39,14 @@ public class ViewData : ISaveable
             doc.CreateElementWithData("RepresentingModel", references.Saving_GetRefCounterFor(NodeModel).ToString()),
             doc.CreateElementWithData("X", ViewportRect.Rect.position.x.ToString()),
             doc.CreateElementWithData("Y", ViewportRect.Rect.position.y.ToString()),
-            doc.CreateElementWithData("IsRemoveable", IsRemoveable.ToString())
+            doc.CreateElementWithData("IsRemoveable", IsRemoveable.ToString()),
+            doc.CreateElementWithData("Title", Title)
         );
     }
 
     public void Load(XmlElement savedData, XmlObjectReferences references)
     {
+        Title = savedData.GetSingleDataFrom("Title");
         NodeViewType = savedData.GetSingleDataFrom("NodeViewTypeString");
         IsRemoveable = bool.Parse(savedData.GetSingleDataFrom("IsRemoveable"));
 

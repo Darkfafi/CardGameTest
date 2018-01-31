@@ -8,11 +8,6 @@ public class AdditionNodeView : BaseNodeView
 {
     private int updatedValue = 0;
 
-    public AdditionNodeView(AdditionNodeModel modelToRepresent, Vector2 pos, IOriginScene scene, bool canBeRemoved) : base(modelToRepresent, pos, scene, canBeRemoved)
-    {
-
-    }
-
     protected override void ContextMenuAddition(GenericMenu gm)
     {
 
